@@ -3,6 +3,11 @@ use windows::{
     Win32::System::LibraryLoader::GetModuleHandleA, Win32::UI::WindowsAndMessaging::*,
 };
 
+/// 
+pub fn ask_yn(message: &str, title: &str) -> bool {
+    unsafe { MessageBoxW(None, message, title, MB_YESNO) == IDNO }
+}
+
 /// Private. Window procedure.
 extern "system" fn wndproc(window: HWND, message: u32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
     unsafe {
