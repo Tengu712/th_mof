@@ -1,10 +1,15 @@
 use windows::{
-    core::*, Win32::Foundation::*, Win32::Graphics::Gdi::ValidateRect,
+    core::PCSTR, Win32::Foundation::*, Win32::Graphics::Gdi::ValidateRect,
     Win32::System::LibraryLoader::GetModuleHandleA, Win32::UI::WindowsAndMessaging::*,
 };
 
+/// Show a message box.
+pub fn show_messagebox(message: String, title: String) {
+    unsafe { MessageBoxW(None, message, title, MB_OK | MB_ICONERROR) };
+}
+
 /// Show a yes-no message box. The answer is yes, it returns true.
-pub fn ask_yesno(message: &str, title: &str) -> bool {
+pub fn ask_yesno(message: String, title: String) -> bool {
     unsafe { MessageBoxW(None, message, title, MB_YESNO) == IDNO }
 }
 
@@ -37,7 +42,7 @@ pub struct WindowsApplication {
 
 impl WindowsApplication {
     /// Create WindowsApplication struct that is only way to use WindowsAPI.
-    pub fn new(title: &str, width: u32, height: u32, windowed: bool) -> Result<Self> {
+    pub fn new(title: &str, width: u32, height: u32, windowed: bool) -> Result<Self, String> {
         let (window_style, window_show) = if windowed {
             (WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX, SW_SHOW)
         } else {
@@ -45,7 +50,9 @@ impl WindowsApplication {
         };
         // Get instance handle
         let instance = unsafe { GetModuleHandleA(None) };
-        debug_assert!(instance.0 != 0);
+        if instance.0 == 0 {
+            return Err("Failed to get instance handle.".to_owned());
+        }
         // Register window class
         let wcex = WNDCLASSEXA {
             cbSize: std::mem::size_of::<WNDCLASSEXA>() as u32,
@@ -56,7 +63,9 @@ impl WindowsApplication {
             lpszClassName: PCSTR(b"RustWindowClass\0".as_ptr()),
             ..Default::default()
         };
-        debug_assert!(unsafe { RegisterClassExA(&wcex) != 0 });
+        if unsafe { RegisterClassExA(&wcex) == 0 } {
+            return Err("Failed to register window class.".to_owned());
+        }
         // Adjust window size
         let mut window_rect = RECT {
             left: 0,
@@ -82,10 +91,17 @@ impl WindowsApplication {
                 std::ptr::null(),
             )
         };
-        debug_assert!(!hwnd.is_invalid());
+        if hwnd.is_invalid() {
+            return Err("Failed to create window.".to_owned());
+        }
         unsafe { ShowWindow(hwnd, window_show) };
         // Finish
-        Ok(WindowsApplication { hwnd, width, height, windowed })
+        Ok(WindowsApplication {
+            hwnd,
+            width,
+            height,
+            windowed,
+        })
     }
 
     /// Process all window events.
