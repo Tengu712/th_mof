@@ -1,9 +1,19 @@
-mod directx;
+pub mod winapis;
+
+use winapis::{direct2d::*, winapi::*};
 
 fn main() {
-    let app = directx::DXApplication::new("Window title", 1280, 960, directx::ask_yn("フルスクリーンで起動しますか？", "Question"));
+    let winapp = WindowsApplication::new(
+        "Window title",
+        1280,
+        960,
+        ask_yesno("フルスクリーンで起動しますか？", "Question"),
+    )
+    .unwrap();
+    let d2dapp = D2DApplication::new(&winapp).unwrap();
+    d2dapp.clear_screen();
     loop {
-        if app.do_event() {
+        if winapp.do_event() {
             break;
         }
     }

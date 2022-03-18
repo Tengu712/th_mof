@@ -3,8 +3,8 @@ use windows::{
     Win32::System::LibraryLoader::GetModuleHandleA, Win32::UI::WindowsAndMessaging::*,
 };
 
-/// 
-pub fn ask_yn(message: &str, title: &str) -> bool {
+/// Show a yes-no message box. The answer is yes, it returns true.
+pub fn ask_yesno(message: &str, title: &str) -> bool {
     unsafe { MessageBoxW(None, message, title, MB_YESNO) == IDNO }
 }
 
@@ -27,11 +27,17 @@ extern "system" fn wndproc(window: HWND, message: u32, wparam: WPARAM, lparam: L
     }
 }
 
-pub struct DXApplication {}
+/// Struct to reference basic objects
+pub struct WindowsApplication {
+    pub hwnd: HWND,
+    pub width: u32,
+    pub height: u32,
+    pub windowed: bool,
+}
 
-impl DXApplication {
-    /// Create DXApplication struct that is only way to use WindowsAPI.
-    pub fn new(title: &str, width: i32, height: i32, windowed: bool) -> Self {
+impl WindowsApplication {
+    /// Create WindowsApplication struct that is only way to use WindowsAPI.
+    pub fn new(title: &str, width: u32, height: u32, windowed: bool) -> Result<Self> {
         let (window_style, window_show) = if windowed {
             (WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX, SW_SHOW)
         } else {
@@ -55,8 +61,8 @@ impl DXApplication {
         let mut window_rect = RECT {
             left: 0,
             top: 0,
-            right: width,
-            bottom: height,
+            right: width as i32,
+            bottom: height as i32,
         };
         unsafe { AdjustWindowRect(&mut window_rect, window_style, false) };
         // Create window and get window handle
@@ -77,9 +83,9 @@ impl DXApplication {
             )
         };
         debug_assert!(!hwnd.is_invalid());
-        // Finish
         unsafe { ShowWindow(hwnd, window_show) };
-        DXApplication {}
+        // Finish
+        Ok(WindowsApplication { hwnd, width, height, windowed })
     }
 
     /// Process all window events.
