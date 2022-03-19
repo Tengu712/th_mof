@@ -22,6 +22,7 @@ fn main() {
             break;
         }
         d2dapp.begin_draw();
+        d2dapp.clear_screen(0.0, 0.0, 0.0);
         d2dapp
             .end_draw()
             .map_err(|e| show_messagebox(e, "Error".to_owned()))

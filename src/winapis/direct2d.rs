@@ -1,14 +1,16 @@
 use windows::{
     core::Interface,
-    Win32::Foundation::*,
-    Win32::Graphics::Direct2D::Common::*,
-    Win32::Graphics::{
-        Direct2D::*,
-        Direct3D::*,
-        Direct3D11::*,
-        Dxgi::{Common::*, *},
+    Foundation::Numerics::*,
+    Win32::{
+        Foundation::*,
+        Graphics::{
+            Direct2D::{Common::*, *},
+            Direct3D::*,
+            Direct3D11::*,
+            Dxgi::{Common::*, *},
+        },
+        System::Com::*,
     },
-    Win32::System::Com::*,
 };
 
 /// Struct to reference Direct2D objects
@@ -144,5 +146,38 @@ impl D2DApplication {
     }
 
     /// Clear screen black.
-    pub fn clear_screen(&self) {}
+    pub fn clear_screen(&self, r: f32, g: f32, b: f32) {
+        unsafe { self.context.Clear(&D2D1_COLOR_F { r, g, b, a: 1.0 }) };
+    }
+
+    /// Create brush
+    pub fn create_brush(
+        &self,
+        r: f32,
+        g: f32,
+        b: f32,
+        a: f32,
+    ) -> Result<ID2D1SolidColorBrush, String> {
+        let color = D2D1_COLOR_F { r, g, b, a };
+        let brushproperties = D2D1_BRUSH_PROPERTIES {
+            opacity: 1.0,
+            transform: Matrix3x2::identity(),
+        };
+        Ok(unsafe {
+            self.context
+                .CreateSolidColorBrush(&color, &brushproperties)
+                .map_err(|e| e.to_string() + "\nFailed to create brush.")?
+        })
+    }
+
+    /// Draw rect.
+    pub fn draw_rect(&self, brush: &ID2D1SolidColorBrush) {
+        let rect = D2D_RECT_F {
+            left: 0.0,
+            top: 0.0,
+            right: 50.0,
+            bottom: 50.0,
+        };
+        unsafe { self.context.FillRectangle(&rect, brush) };
+    }
 }
