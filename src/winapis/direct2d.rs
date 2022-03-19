@@ -42,7 +42,7 @@ impl D2DApplication {
                 &D2D1_FACTORY_OPTIONS::default(),
                 std::mem::transmute(&mut ppifactory),
             )
-            .map_err(|e| e.to_string())?;
+            .map_err(|e| e.to_string() + "\nFailed to create D2D1CreateFactory.")?;
             ppifactory.ok_or("The Option of D2D1CreateFactry is None.")?
         };
         // Create D3D11Device
@@ -256,14 +256,14 @@ impl D2DApplication {
                     1.0,
                     WICBitmapPaletteTypeMedianCut,
                 )
-                .map_err(|e| e.to_string())?
+                .map_err(|e| e.to_string() + "\nFailed to initialize converter. : " + filename)?
         };
         let mut width = 0;
         let mut height = 0;
         unsafe {
             converter
                 .GetSize(&mut width, &mut height)
-                .map_err(|e| e.to_string())?
+                .map_err(|e| e.to_string() + "\nFailed to get image size. : " + filename)?
         };
         let bitmap = unsafe {
             self.context
