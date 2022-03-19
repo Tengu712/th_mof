@@ -8,15 +8,23 @@ use windows::{
             Direct3D::*,
             Direct3D11::*,
             Dxgi::{Common::*, *},
+            Imaging::*,
         },
-        System::Com::*,
+        System::{Com::*, SystemServices::*},
     },
 };
 
-/// Struct to reference Direct2D objects
+/// Struct to reference Direct2D objects.
 pub struct D2DApplication {
     context: ID2D1DeviceContext,
     swapchain: IDXGISwapChain1,
+}
+
+/// Struct to reference image data.
+pub struct Image {
+    bitmap: ID2D1Bitmap,
+    width: u32,
+    height: u32,
 }
 
 impl D2DApplication {
@@ -150,6 +158,47 @@ impl D2DApplication {
         unsafe { self.context.Clear(&D2D1_COLOR_F { r, g, b, a: 1.0 }) };
     }
 
+    /// Draw rect.
+    pub fn draw_rect(&self, brush: &ID2D1SolidColorBrush) {
+        let rect = D2D_RECT_F {
+            left: 0.0,
+            top: 0.0,
+            right: 50.0,
+            bottom: 50.0,
+        };
+        unsafe { self.context.FillRectangle(&rect, brush) };
+    }
+
+    /// Draw Image.
+    pub fn draw_image(&self, image: &Image, left: f32, top: f32, width: f32, height: f32) {
+        let dst_rect = D2D_RECT_F {
+            left,
+            top,
+            right: left + width,
+            bottom: top + height,
+        };
+        let src_rect = D2D_RECT_F {
+            left: 0.0,
+            top: 0.0,
+            right: image.width as f32,
+            bottom: image.height as f32,
+        };
+        unsafe {
+            self.context.DrawBitmap(
+                &image.bitmap,
+                &dst_rect,
+                1.0,
+                D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
+                &src_rect,
+            )
+        };
+    }
+
+    /// Draw Image at the center.
+    pub fn draw_image_center(&self, image: &Image, left: f32, top: f32, width: f32, height: f32) {
+        self.draw_image(image, left - width / 2.0, top - height / 2.0, width, height);
+    }
+
     /// Create brush
     pub fn create_brush(
         &self,
@@ -170,14 +219,61 @@ impl D2DApplication {
         })
     }
 
-    /// Draw rect.
-    pub fn draw_rect(&self, brush: &ID2D1SolidColorBrush) {
-        let rect = D2D_RECT_F {
-            left: 0.0,
-            top: 0.0,
-            right: 50.0,
-            bottom: 50.0,
+    /// Create bitmap
+    pub fn create_image_from_file(&self, filename: &str) -> Result<Image, String> {
+        let factory: IWICImagingFactory = unsafe {
+            CoCreateInstance(&CLSID_WICImagingFactory, None, CLSCTX_SERVER).map_err(|e| {
+                e.to_string() + "\nFailed to create IWICImagingFactory. : " + filename
+            })?
         };
-        unsafe { self.context.FillRectangle(&rect, brush) };
+        let decoder = unsafe {
+            factory
+                .CreateDecoderFromFilename(
+                    filename,
+                    std::ptr::null(),
+                    GENERIC_READ,
+                    WICDecodeMetadataCacheOnLoad,
+                )
+                .map_err(|e| e.to_string() + "\nFailed to create decoder. : " + filename)?
+        };
+        let frame = unsafe {
+            decoder
+                .GetFrame(0)
+                .map_err(|e| e.to_string() + "\nFailed to get frame. : " + filename)?
+        };
+        let converter = unsafe {
+            factory
+                .CreateFormatConverter()
+                .map_err(|e| e.to_string() + "\nFailed to create format converter. : " + filename)?
+        };
+        unsafe {
+            converter
+                .Initialize(
+                    frame,
+                    &GUID_WICPixelFormat32bppPBGRA,
+                    WICBitmapDitherTypeNone,
+                    None,
+                    1.0,
+                    WICBitmapPaletteTypeMedianCut,
+                )
+                .map_err(|e| e.to_string())?
+        };
+        let mut width = 0;
+        let mut height = 0;
+        unsafe {
+            converter
+                .GetSize(&mut width, &mut height)
+                .map_err(|e| e.to_string())?
+        };
+        let bitmap = unsafe {
+            self.context
+                .CreateBitmapFromWicBitmap(converter, std::ptr::null())
+                .map_err(|e| e.to_string() + "\nFailed to create bitmap. : " + filename)?
+        };
+        Ok(Image {
+            bitmap,
+            width,
+            height,
+        })
     }
 }
