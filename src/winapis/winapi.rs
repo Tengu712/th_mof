@@ -4,12 +4,12 @@ use windows::{
 };
 
 /// Show a message box.
-pub fn show_messagebox(message: String, title: String) {
+pub fn show_messagebox(message: &str, title: &str) {
     unsafe { MessageBoxW(None, message, title, MB_OK | MB_ICONERROR) };
 }
 
 /// Show a yes-no message box. The answer is yes, it returns true.
-pub fn ask_yesno(message: String, title: String) -> bool {
+pub fn ask_yesno(message: &str, title: &str) -> bool {
     unsafe { MessageBoxW(None, message, title, MB_YESNO) == IDNO }
 }
 
@@ -94,7 +94,7 @@ impl WindowsApplication {
         }
         unsafe { ShowWindow(hwnd, window_show) };
         // Finish
-        Ok(WindowsApplication {
+        Ok(Self {
             hwnd,
             width,
             height,

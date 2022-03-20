@@ -23,8 +23,8 @@ pub struct D2DApplication {
 /// Struct to reference image data.
 pub struct Image {
     bitmap: ID2D1Bitmap,
-    width: u32,
-    height: u32,
+    pub width: u32,
+    pub height: u32,
 }
 
 impl D2DApplication {
@@ -125,7 +125,7 @@ impl D2DApplication {
         };
         unsafe { context.SetTarget(bitmap) };
         // Finish
-        Ok(D2DApplication { context, swapchain })
+        Ok(Self { context, swapchain })
     }
 
     /// Call this at the first of drawing
@@ -170,7 +170,24 @@ impl D2DApplication {
     }
 
     /// Draw Image.
-    pub fn draw_image(&self, image: &Image, left: f32, top: f32, width: f32, height: f32) {
+    pub fn draw_image(
+        &self,
+        image: &Image,
+        left: f32,
+        top: f32,
+        width: f32,
+        height: f32,
+        uv_left: f32,
+        uv_top: f32,
+        uv_width: f32,
+        uv_height: f32,
+        center: bool,
+    ) {
+        let (left, top) = if center {
+            (left - width / 2.0, top - height / 2.0)
+        } else {
+            (left, top)
+        };
         let dst_rect = D2D_RECT_F {
             left,
             top,
@@ -178,10 +195,10 @@ impl D2DApplication {
             bottom: top + height,
         };
         let src_rect = D2D_RECT_F {
-            left: 0.0,
-            top: 0.0,
-            right: image.width as f32,
-            bottom: image.height as f32,
+            left: uv_left,
+            top: uv_top,
+            right: uv_left + uv_width,
+            bottom: uv_top + uv_height,
         };
         unsafe {
             self.context.DrawBitmap(
@@ -192,11 +209,6 @@ impl D2DApplication {
                 &src_rect,
             )
         };
-    }
-
-    /// Draw Image at the center.
-    pub fn draw_image_center(&self, image: &Image, left: f32, top: f32, width: f32, height: f32) {
-        self.draw_image(image, left - width / 2.0, top - height / 2.0, width, height);
     }
 
     /// Create brush
@@ -219,7 +231,7 @@ impl D2DApplication {
         })
     }
 
-    /// Create bitmap
+    /// Create image
     pub fn create_image_from_file(&self, filename: &str) -> Result<Image, String> {
         let factory: IWICImagingFactory = unsafe {
             CoCreateInstance(&CLSID_WICImagingFactory, None, CLSCTX_SERVER).map_err(|e| {
