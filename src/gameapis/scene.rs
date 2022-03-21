@@ -1,7 +1,4 @@
-use super::{
-    super::winapis::input::*,
-    {requests::*, resources::*},
-};
+use super::{input::*, requests::*, resource::*};
 
 /// A eunm for scene that's matched at mainloop.
 pub enum Scene {
@@ -13,7 +10,7 @@ pub struct TitleScene {}
 
 impl TitleScene {
     /// Return TitleScene wraped in Scene.
-    /// Super module can call this and start running scenes.
+    /// Super module can call this and start running scene.
     pub fn new() -> Scene {
         Scene::Title(Self {})
     }
@@ -42,7 +39,7 @@ impl GameScene {
         if self.count == self.start {
             println!("bang! {}  {}", self.count, self.start);
         }
-        if keystates.space > 0 {
+        if keystates.space == 1 {
             println!("space");
         }
         (

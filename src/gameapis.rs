@@ -1,3 +1,4 @@
+pub mod input;
 pub mod requests;
-pub mod resources;
-pub mod scenes;
+pub mod resource;
+pub mod scene;

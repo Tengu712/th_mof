@@ -1,6 +1,11 @@
 use windows::{
-    core::PCSTR, Win32::Foundation::*, Win32::Graphics::Gdi::ValidateRect,
-    Win32::System::LibraryLoader::GetModuleHandleA, Win32::UI::WindowsAndMessaging::*,
+    core::PCSTR,
+    Win32::{
+        Foundation::*,
+        Graphics::Gdi::ValidateRect,
+        System::LibraryLoader::GetModuleHandleA,
+        UI::{Input::KeyboardAndMouse::*, WindowsAndMessaging::*},
+    },
 };
 
 /// Show a message box.
@@ -11,6 +16,17 @@ pub fn show_messagebox(message: &str, title: &str) {
 /// Show a yes-no message box. The answer is yes, it returns true.
 pub fn ask_yesno(message: &str, title: &str) -> bool {
     unsafe { MessageBoxW(None, message, title, MB_YESNO) == IDNO }
+}
+
+/// Get key state and return next value based on previous.
+pub fn get_next_keystate(vkey: i32, state: i16) -> i16 {
+    if (unsafe { GetAsyncKeyState(vkey) } as u16 & 0x8000) > 0 {
+        std::cmp::max(state + 1, 1)
+    } else if state > 0 {
+        -1
+    } else {
+        0
+    }
 }
 
 /// Private. Window procedure.

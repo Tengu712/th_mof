@@ -1,4 +1,4 @@
-use super::{super::resources::ImgResID, *};
+use super::{super::resource::ImgResID, *};
 
 /// A struct that's entity of drawing image request.
 #[derive(Clone, Copy)]

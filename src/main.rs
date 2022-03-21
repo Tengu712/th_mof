@@ -1,9 +1,9 @@
 pub mod gameapis;
 pub mod winapis;
 
-use gameapis::{requests::*, resources::*, scenes::*};
+use gameapis::{input::*, requests::*, resource::*, scene::*};
 use std::collections::HashMap;
-use winapis::{direct2d::*, input::*, winapi::*};
+use winapis::{direct2d::*, winapi::*};
 
 /// A struct for application and resource bank to run the game.
 struct Application {
