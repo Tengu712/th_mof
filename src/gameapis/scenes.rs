@@ -1,4 +1,7 @@
-use super::{requests::*, resources::*};
+use super::{
+    super::winapis::input::*,
+    {requests::*, resources::*},
+};
 
 /// A eunm for scene that's matched at mainloop.
 pub enum Scene {
@@ -15,7 +18,7 @@ impl TitleScene {
         Scene::Title(Self {})
     }
     /// Update title scene. Return the next state and requests.
-    pub fn update(self) -> (Scene, Requests) {
+    pub fn update(self, keystate: &KeyStates) -> (Scene, Requests) {
         (GameScene::new(), Requests::new())
     }
 }
@@ -35,9 +38,12 @@ impl GameScene {
         })
     }
     /// Update game scene. Return the next state and requests.
-    pub fn update(self) -> (Scene, Requests) {
+    pub fn update(self, keystates: &KeyStates) -> (Scene, Requests) {
         if self.count == self.start {
             println!("bang! {}  {}", self.count, self.start);
+        }
+        if keystates.space > 0 {
+            println!("space");
         }
         (
             Scene::Game(Self {

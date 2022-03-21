@@ -3,7 +3,7 @@ pub mod winapis;
 
 use gameapis::{requests::*, resources::*, scenes::*};
 use std::collections::HashMap;
-use winapis::{direct2d::*, winapi::*};
+use winapis::{direct2d::*, input::*, winapi::*};
 
 /// A struct for application and resource bank to run the game.
 struct Application {
@@ -33,11 +33,13 @@ impl Application {
     /// **[Side Effect]**
     /// Run the game.
     fn run(self) -> Result<(), String> {
+        let mut keystates = KeyStates::new();
         let mut scene = TitleScene::new();
         while !self.winapp.do_event() {
+            keystates = keystates.detect(KeyCode::Space);
             let (next, reqs) = match scene {
-                Scene::Title(n) => n.update(),
-                Scene::Game(n) => n.update(),
+                Scene::Title(n) => n.update(&keystates),
+                Scene::Game(n) => n.update(&keystates),
             };
             scene = next;
             self.d2dapp.begin_draw();
