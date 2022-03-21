@@ -23,7 +23,6 @@ impl Application {
         )?;
         let d2dapp = D2DApplication::new(&winapp)?;
         let mut images = HashMap::new();
-        images.insert(ImgResID::A, d2dapp.create_image_from_file("img/a.png")?);
         Ok(Self {
             winapp,
             d2dapp,
@@ -56,7 +55,10 @@ impl Application {
     fn do_request(&self, request: &Request) -> Result<(), String> {
         match request {
             Request::Image(n) => {
-                let image = self.images.get(&n.key).ok_or("Invalid draw request.")?;
+                let image = self
+                    .images
+                    .get(&n.key)
+                    .ok_or(format!("{} : {:?}", "Invalid draw request.", &n.key))?;
                 let width = n.width.unwrap_or(image.width as f32);
                 let height = n.height.unwrap_or(image.height as f32);
                 let uv_width = n.uv_width.unwrap_or(image.width as f32);
