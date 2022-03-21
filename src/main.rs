@@ -37,6 +37,7 @@ impl Application {
         while !self.winapp.do_event() {
             let (next, reqs) = match scene {
                 Scene::Title(n) => n.update(),
+                Scene::Game(n) => n.update(),
             };
             scene = next;
             self.d2dapp.begin_draw();
