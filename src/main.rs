@@ -1,7 +1,7 @@
 pub mod gameapis;
 pub mod winapis;
 
-use gameapis::{resources::*, scenes::*};
+use gameapis::{requests::*, resources::*, scenes::*};
 use std::collections::HashMap;
 use winapis::{direct2d::*, winapi::*};
 
@@ -9,7 +9,7 @@ use winapis::{direct2d::*, winapi::*};
 struct Application {
     winapp: WindowsApplication,
     d2dapp: D2DApplication,
-    images: HashMap<String, Image>,
+    images: HashMap<ImgResID, Image>,
 }
 
 impl Application {
@@ -23,10 +23,7 @@ impl Application {
         )?;
         let d2dapp = D2DApplication::new(&winapp)?;
         let mut images = HashMap::new();
-        images.insert(
-            String::from("a"),
-            d2dapp.create_image_from_file("img/a.png")?,
-        );
+        images.insert(ImgResID::A, d2dapp.create_image_from_file("img/a.png")?);
         Ok(Self {
             winapp,
             d2dapp,
@@ -37,16 +34,15 @@ impl Application {
     /// **[Side Effect]**
     /// Run the game.
     fn run(self) -> Result<(), String> {
-        let mut scene = Scene::new();
-        loop {
-            if self.winapp.do_event() {
-                break;
-            }
-            let (next, reqs) = scene.update();
+        let mut scene = TitleScene::new();
+        while !self.winapp.do_event() {
+            let (next, reqs) = match scene {
+                Scene::Title(n) => n.update(),
+            };
             scene = next;
             self.d2dapp.begin_draw();
             self.d2dapp.clear_screen(0.0, 0.0, 0.0);
-            for req in reqs {
+            for req in reqs.get_array().iter() {
                 self.do_request(req)?;
             }
             self.d2dapp.end_draw()?;
@@ -57,13 +53,10 @@ impl Application {
 
     /// **[Side Effect]**
     /// Do requests of drawing image or.
-    fn do_request(&self, req: Request) -> Result<(), String> {
-        match req {
+    fn do_request(&self, request: &Request) -> Result<(), String> {
+        match request {
             Request::Image(n) => {
-                let image = self
-                    .images
-                    .get(n.key.as_str())
-                    .ok_or(n.key + "\nInvalid draw request.")?;
+                let image = self.images.get(&n.key).ok_or("Invalid draw request.")?;
                 let width = n.width.unwrap_or(image.width as f32);
                 let height = n.height.unwrap_or(image.height as f32);
                 let uv_width = n.uv_width.unwrap_or(image.width as f32);
@@ -73,6 +66,7 @@ impl Application {
                     n.center,
                 );
             }
+            _ => (),
         }
         Ok(())
     }

@@ -1,33 +1,21 @@
-use super::resources::*;
+use super::{requests::*, resources::*};
 
-/// A struct that has a function field that updates each scene and common fields that all scene need.
-pub struct Scene {
-    updater: fn(Self) -> (Self, Vec<Request>),
+/// A eunm for scene that's matched at mainloop.
+pub enum Scene {
+    Title(TitleScene),
 }
 
-impl Scene {
-    /// Constructor for user.
-    pub fn new() -> Self {
-        Self {
-            updater: update_title,
-        }
-    }
-    /// Update scene.
-    pub fn update(self) -> (Self, Vec<Request>) {
-        (self.updater)(self)
-    }
-}
+pub struct TitleScene {}
 
-/// Private function. Update title scene.
-fn update_title(scene: Scene) -> (Scene, Vec<Request>) {
-    let mut reqs = Vec::new();
-    reqs.push(create_imgreq_wh(
-        String::from("a"),
-        0.0,
-        0.0,
-        1280.0,
-        720.0,
-        false,
-    ));
-    (scene, reqs)
+impl TitleScene {
+    /// Return TitleScene wraped in Scene.
+    /// Super module can call this and start running scenes.
+    pub fn new() -> Scene {
+        Scene::Title(Self {})
+    }
+    /// Update title scene.
+    pub fn update(self) -> (Scene, Requests) {
+        let reqs = Requests::new().push_imgrq_wh(ImgResID::A, 0.0, 0.0, 1280.0, 720.0, false);
+        (Scene::Title(TitleScene {}), reqs)
+    }
 }
