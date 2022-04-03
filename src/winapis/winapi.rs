@@ -58,7 +58,7 @@ impl WindowsApplication {
     /// Create WindowsApplication struct that is only way to use WindowsAPI.
     pub fn new(title: &str, width: u32, height: u32, windowed: bool) -> Result<Self, String> {
         let (window_style, window_show) = if windowed {
-            (WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX, SW_SHOW)
+            (WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, SW_SHOW)
         } else {
             (WS_POPUP, SW_SHOWMAXIMIZED)
         };
@@ -87,7 +87,7 @@ impl WindowsApplication {
             right: width as i32,
             bottom: height as i32,
         };
-        unsafe { AdjustWindowRect(&mut window_rect, window_style, false) };
+        unsafe { AdjustWindowRectEx(&mut window_rect, window_style, false, Default::default()) };
         // Create window and get window handle
         let hwnd = unsafe {
             CreateWindowExA(
