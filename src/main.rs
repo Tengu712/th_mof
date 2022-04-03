@@ -15,14 +15,29 @@ struct Application {
 impl Application {
     /// Constructor.
     fn new() -> Result<Self, String> {
-        let winapp = WindowsApplication::new(
-            "Window title",
-            1280,
-            720,
-            ask_yesno("フルスクリーンで起動しますか？", "Question"),
-        )?;
+        let winapp = WindowsApplication::new("Window title", 1280, 720, true)?;
         let d2dapp = D2DApplication::new(&winapp)?;
         let mut images = HashMap::new();
+        // Character
+        images.insert(
+            ImgResID::Udonge,
+            d2dapp.create_image_from_file(
+                "C:/Users/kazuki/OneDrive/touhou/illust/2022spring/game/udonge.png",
+            )?,
+        );
+        images.insert(
+            ImgResID::Tei,
+            d2dapp.create_image_from_file(
+                "C:/Users/kazuki/OneDrive/touhou/illust/2022spring/game/tei.png",
+            )?,
+        );
+        // Backgrounds
+        images.insert(
+            ImgResID::StageBamboo,
+            d2dapp.create_image_from_file(
+                "C:/Users/kazuki/OneDrive/touhou/illust/2022spring/game/stage_bamboo.png",
+            )?,
+        );
         Ok(Self {
             winapp,
             d2dapp,
@@ -36,7 +51,7 @@ impl Application {
         let mut keystates = KeyStates::new();
         let mut scene = TitleScene::new();
         while !self.winapp.do_event() {
-            keystates = keystates.detect(KeyCode::Space);
+            keystates = keystates.detect(KeyCode::Z).detect(KeyCode::L);
             let (next, reqs) = match scene {
                 Scene::Title(n) => n.update(&keystates),
                 Scene::Game(n) => n.update(&keystates),

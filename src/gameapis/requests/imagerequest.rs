@@ -56,7 +56,33 @@ impl Requests {
         }))
     }
 
-    /// Push image request with width and height.
+    /// Push image request with uv.
+    pub fn push_imgrq_uv(
+        self,
+        key: ImgResID,
+        left: f32,
+        top: f32,
+        width: f32,
+        height: f32,
+        uv_left: f32,
+        uv_top: f32,
+        center: bool,
+    ) -> Self {
+        self.push_request(Request::Image(ImageRequest {
+            key,
+            left,
+            top,
+            width: Some(width),
+            height: Some(height),
+            uv_left: uv_left,
+            uv_top: uv_top,
+            uv_width: Some(width),
+            uv_height: Some(height),
+            center,
+        }))
+    }
+
+    /// Push image request with uv and width and height.
     pub fn push_imgrq_whuv(
         self,
         key: ImgResID,

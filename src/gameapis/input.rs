@@ -2,13 +2,15 @@ use super::super::winapis::winapi::get_next_keystate;
 
 /// A enum for abstract key code.
 pub enum KeyCode {
-    Space,
+    Z,
+    L,
 }
 
 /// A struct for keeping key states.
 #[derive(Clone, Default)]
 pub struct KeyStates {
-    pub space: i16,
+    pub z: i16,
+    pub l: i16,
 }
 
 impl KeyStates {
@@ -20,7 +22,8 @@ impl KeyStates {
     pub fn detect(self, code: KeyCode) -> Self {
         let mut cloned = self.clone();
         match code {
-            KeyCode::Space => cloned.space = get_next_keystate(32, cloned.space),
+            KeyCode::Z => cloned.z = get_next_keystate(0x5A, cloned.z),
+            KeyCode::L => cloned.l = get_next_keystate(0x4C, cloned.l),
         };
         cloned
     }
