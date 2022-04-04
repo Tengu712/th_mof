@@ -21,14 +21,14 @@ impl Character {
         Self { id, shoot_count: 0 }
     }
     /// A method for abstracting updating shoot count.
-    pub fn update(self, keystate: i16) -> Self {
+    pub fn update(self, shoot: bool) -> Self {
         let end = match self.id {
             CharaID::Udonge => 13,
             CharaID::Tei => 13,
         };
         let shoot_count = if self.shoot_count > 0 && self.shoot_count < end {
             self.shoot_count + 1
-        } else if keystate == 1 {
+        } else if shoot {
             1
         } else {
             0

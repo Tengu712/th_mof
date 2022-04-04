@@ -1,7 +1,7 @@
 pub mod gameapis;
 pub mod winapis;
 
-use gameapis::{input::*, requests::*, resource::*, scene::*};
+use gameapis::{input::*, requests::*, resource::*, scenes::*};
 use std::collections::HashMap;
 use winapis::{direct2d::*, winapi::*};
 
