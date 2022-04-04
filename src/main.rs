@@ -33,6 +33,18 @@ impl Application {
         );
         // Backgrounds
         images.insert(
+            ImgResID::Black,
+            d2dapp.create_image_from_file(
+                "C:/Users/kazuki/OneDrive/touhou/illust/2022spring/game/black.png",
+            )?,
+        );
+        images.insert(
+            ImgResID::Red,
+            d2dapp.create_image_from_file(
+                "C:/Users/kazuki/OneDrive/touhou/illust/2022spring/game/red.png",
+            )?,
+        );
+        images.insert(
             ImgResID::StageBamboo,
             d2dapp.create_image_from_file(
                 "C:/Users/kazuki/OneDrive/touhou/illust/2022spring/game/stage_bamboo.png",

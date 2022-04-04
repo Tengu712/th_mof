@@ -2,16 +2,19 @@ use super::{
     super::{
         input::*,
         requests::{imagerequest::*, *},
+        resource::*,
         scenes::*,
     },
     game::*,
 };
 
 impl GameScene {
-    ///
+    /// Backgound, black mask, characters. 
+    /// Player can start shooting. If it shoots during the state, it loses.
     pub fn update_waiting(self, keystates: &KeyStates) -> (Scene, Requests) {
         let reqs = Requests::new()
             .push_imgrq(ImageRequest::new(self.get_imgresid()))
+            .push_imgrq(ImageRequest::new(ImgResID::Black).alph(0.5))
             .push_imgrq(self.chara_1p.get_imgrq())
             .push_request(Request::Reverse(true))
             .push_imgrq(self.chara_2p.get_imgrq())

@@ -3,5 +3,7 @@
 pub enum ImgResID {
     Udonge,
     Tei,
+    Black,
+    Red,
     StageBamboo,
 }
