@@ -9,7 +9,7 @@ use super::{
 };
 
 impl GameScene {
-    /// Backgound, black mask, characters. 
+    /// Backgound, black mask, characters.
     /// Player can start shooting. If it shoots during the state, it loses.
     pub fn update_waiting(self, keystates: &KeyStates) -> (Scene, Requests) {
         let reqs = Requests::new()
@@ -22,8 +22,9 @@ impl GameScene {
         let chara_1p = self.chara_1p.update(keystates.z == 1);
         let chara_2p = self.chara_2p.update(keystates.l == 1);
         let (state, count) = if self.count == self.start {
-            println!("bang! {}  {}", self.count, self.start);
             (GameState::Shooting, 0)
+        } else if chara_1p.is_shot() || chara_2p.is_shot() {
+            (GameState::Ending, 0)
         } else {
             (GameState::Waiting, self.count + 1)
         };

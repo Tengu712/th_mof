@@ -1,5 +1,23 @@
 use super::{requests::imagerequest::*, resource::*};
 
+/// A indicator function for make code clear. u32.
+fn indicator_u32(arg: u32) -> u32 {
+    if arg > 0 {
+        1
+    } else {
+        0
+    }
+}
+
+/// A indicator function for make code clear. bool.
+fn indicator_bool(arg: bool) -> u32 {
+    if arg {
+        1
+    } else {
+        0
+    }
+}
+
 /// A enum for identifing characters.
 pub enum CharaID {
     Udonge,
@@ -19,20 +37,25 @@ impl Character {
     }
     /// A method for abstracting updating shoot count.
     pub fn update(self, shoot: bool) -> Self {
-        let end = match self.id {
-            CharaID::Udonge => 13,
-            CharaID::Tei => 13,
-        };
-        let shoot_count = if self.shoot_count > 0 && self.shoot_count < end {
-            self.shoot_count + 1
-        } else if shoot {
-            1
-        } else {
-            0
-        };
+        let end = self.get_end_of_shot();
+        let shoot_count = (self.shoot_count + 1)
+            * indicator_u32(self.shoot_count)
+            * indicator_bool(self.shoot_count > 0 && self.shoot_count < end)
+            + indicator_bool(shoot) * indicator_bool(self.shoot_count == 0);
         Self {
             id: self.id,
             shoot_count,
+        }
+    }
+    /// A method to get ImageRequest of character.
+    pub fn get_imgrq(&self) -> ImageRequest {
+        let imgrq = ImageRequest::new(self.get_imgresid())
+            .wh(512.0, 720.0)
+            .uv(0.0, 0.0);
+        match self.id {
+            CharaID::Udonge if self.shoot_count > 0 => imgrq.uv(512.0, 0.0),
+            CharaID::Tei if self.shoot_count > 0 => imgrq.uv(512.0, 0.0),
+            _ => imgrq,
         }
     }
     /// A method to get ImgResID based on CharaID.
@@ -42,15 +65,17 @@ impl Character {
             CharaID::Tei => ImgResID::Tei,
         }
     }
-    /// A method
-    pub fn get_imgrq(&self) -> ImageRequest {
-        let imgrq = ImageRequest::new(self.get_imgresid())
-            .wh(512.0, 720.0)
-            .uv(0.0, 0.0);
+    /// A method to get frame of end of shot.
+    fn get_end_of_shot(&self) -> u32 {
         match self.id {
-            CharaID::Udonge if self.shoot_count > 0 => imgrq.uv(512.0, 0.0),
-            CharaID::Tei if self.shoot_count > 0 => imgrq.uv(512.0, 0.0),
-            _ => imgrq,
+            _ => 13,
+        }
+    }
+    /// A method to judge shoot timing.
+    pub fn is_shot(&self) -> bool {
+        match self.id {
+            _ if self.shoot_count == 3 => true,
+            _ => false,
         }
     }
 }
