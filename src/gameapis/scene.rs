@@ -51,7 +51,7 @@ impl GameScene {
         let (imgkey_1p, uvl_1p, uvt_1p) = chara_1p.get_drawinfo();
         let (imgkey_2p, uvl_2p, uvt_2p) = chara_2p.get_drawinfo();
         let reqs = Requests::new()
-            .push_imgrq(ImgResID::StageBamboo, 0.0, 0.0, false)
+            .push_imgrq_xy(ImgResID::StageBamboo, 0.0, 0.0, false)
             .push_imgrq_uv(imgkey_1p, 0.0, 0.0, 512.0, 720.0, uvl_1p, uvt_1p, false)
             .push_request(Request::Reverse(true))
             .push_imgrq_uv(imgkey_2p, 0.0, 0.0, 512.0, 720.0, uvl_2p, uvt_2p, false)

@@ -17,7 +17,7 @@ pub struct ImageRequest {
 
 impl Requests {
     /// Push image request simply.
-    pub fn push_imgrq(self, key: ImgResID, left: f32, top: f32, center: bool) -> Self {
+    pub fn push_imgrq_xy(self, key: ImgResID, left: f32, top: f32, center: bool) -> Self {
         self.push_request(Request::Image(ImageRequest {
             key,
             left,
@@ -83,7 +83,7 @@ impl Requests {
     }
 
     /// Push image request with uv and width and height.
-    pub fn push_imgrq_whuv(
+    pub fn push_imgrq(
         self,
         key: ImgResID,
         left: f32,
