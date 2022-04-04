@@ -44,7 +44,6 @@ impl Application {
             images,
         })
     }
-
     /// **[Side Effect]**
     /// Run the game.
     fn run(self) -> Result<(), String> {
@@ -67,7 +66,6 @@ impl Application {
         }
         Ok(())
     }
-
     /// **[Side Effect]**
     /// Do requests of drawing image or.
     fn do_request(&self, request: &Request) -> Result<(), String> {
@@ -84,7 +82,7 @@ impl Application {
                 let uv_height = n.uv_height.unwrap_or(image.height as f32);
                 self.d2dapp.draw_image(
                     image, n.left, n.top, width, height, n.uv_left, n.uv_top, uv_width, uv_height,
-                    n.center,
+                    n.alpha, n.center,
                 );
             }
             _ => (),

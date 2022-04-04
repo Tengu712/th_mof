@@ -1,7 +1,4 @@
-use super::{
-    requests::{imagerequest::*, *},
-    resource::*,
-};
+use super::{requests::imagerequest::*, resource::*};
 
 /// A enum for identifing characters.
 pub enum CharaID {
@@ -39,31 +36,21 @@ impl Character {
         }
     }
     /// A method to get ImgResID based on CharaID.
-    fn get_imgresid(&self) -> ImgResID {
+    pub fn get_imgresid(&self) -> ImgResID {
         match self.id {
             CharaID::Udonge => ImgResID::Udonge,
             CharaID::Tei => ImgResID::Tei,
         }
     }
     /// A method
-    pub fn get_imgrqs(&self) -> Request {
-        let mut imgrq = ImageRequest {
-            key: self.get_imgresid(),
-            left: 0.0,
-            top: 0.0,
-            width: Some(512.0),
-            height: Some(720.0),
-            uv_left: 0.0,
-            uv_top: 0.0,
-            uv_width: Some(512.0),
-            uv_height: Some(720.0),
-            center: false,
-        };
+    pub fn get_imgrq(&self) -> ImageRequest {
+        let imgrq = ImageRequest::new(self.get_imgresid())
+            .wh(512.0, 720.0)
+            .uv(0.0, 0.0);
         match self.id {
-            CharaID::Udonge if self.shoot_count > 0 => imgrq.uv_left = 512.0,
-            CharaID::Tei if self.shoot_count > 0 => imgrq.uv_left = 512.0,
-            _ => (),
+            CharaID::Udonge if self.shoot_count > 0 => imgrq.uv(512.0, 0.0),
+            CharaID::Tei if self.shoot_count > 0 => imgrq.uv(512.0, 0.0),
+            _ => imgrq,
         }
-        Request::Image(imgrq)
     }
 }

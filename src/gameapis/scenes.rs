@@ -1,8 +1,8 @@
+pub mod game;
 pub mod game_ending;
 pub mod game_shooting;
 pub mod game_talking;
 pub mod game_waiting;
-pub mod game;
 
 use super::{character::*, input::*, requests::*, resource::*};
 use game::*;

@@ -12,101 +12,68 @@ pub struct ImageRequest {
     pub uv_top: f32,
     pub uv_width: Option<f32>,
     pub uv_height: Option<f32>,
+    pub alpha: f32,
     pub center: bool,
 }
 
-impl Requests {
-    /// Push image request simply.
-    pub fn push_imgrq_xy(self, key: ImgResID, left: f32, top: f32, center: bool) -> Self {
-        self.push_request(Request::Image(ImageRequest {
+impl ImageRequest {
+    /// Constructor.
+    pub fn new(key: ImgResID) -> Self {
+        Self {
             key,
-            left,
-            top,
+            left: 0.0,
+            top: 0.0,
             width: None,
             height: None,
             uv_left: 0.0,
             uv_top: 0.0,
             uv_width: None,
             uv_height: None,
-            center,
-        }))
+            alpha: 1.0,
+            center: false,
+        }
     }
-
-    /// Push image request with width and height.
-    pub fn push_imgrq_wh(
-        self,
-        key: ImgResID,
-        left: f32,
-        top: f32,
-        width: f32,
-        height: f32,
-        center: bool,
-    ) -> Self {
-        self.push_request(Request::Image(ImageRequest {
-            key,
-            left,
-            top,
-            width: Some(width),
-            height: Some(height),
-            uv_left: 0.0,
-            uv_top: 0.0,
-            uv_width: None,
-            uv_height: None,
-            center,
-        }))
+    /// A method to set left and top.
+    pub fn lt(self, left: f32, top: f32) -> Self {
+        let mut cloned = self.clone();
+        cloned.left = left;
+        cloned.top = top;
+        cloned
     }
-
-    /// Push image request with uv.
-    pub fn push_imgrq_uv(
-        self,
-        key: ImgResID,
-        left: f32,
-        top: f32,
-        width: f32,
-        height: f32,
-        uv_left: f32,
-        uv_top: f32,
-        center: bool,
-    ) -> Self {
-        self.push_request(Request::Image(ImageRequest {
-            key,
-            left,
-            top,
-            width: Some(width),
-            height: Some(height),
-            uv_left: uv_left,
-            uv_top: uv_top,
-            uv_width: Some(width),
-            uv_height: Some(height),
-            center,
-        }))
+    /// A method to set width and height.
+    pub fn wh(self, width: f32, height: f32) -> Self {
+        let mut cloned = self.clone();
+        cloned.width = Some(width);
+        cloned.height = Some(height);
+        cloned
     }
+    /// A method to set uv. 
+    /// uv_width and uv_height will be same as width and height.
+    pub fn uv(self, uv_left: f32, uv_top: f32) -> Self {
+        let mut cloned = self.clone();
+        cloned.uv_left = uv_left;
+        cloned.uv_top = uv_top;
+        cloned.uv_width = cloned.width;
+        cloned.uv_height = cloned.height;
+        cloned
+    }
+    /// A method to set alpha.
+    pub fn alph(self, alpha: f32) -> Self {
+        let mut cloned = self.clone();
+        cloned.alpha = alpha;
+        cloned
+    }
+    /// A method to set center.
+    pub fn cntr(self, center: bool) -> Self {
+        let mut cloned = self.clone();
+        cloned.center = center;
+        cloned
+    }
+}
 
-    /// Push image request with uv and width and height.
-    pub fn push_imgrq(
-        self,
-        key: ImgResID,
-        left: f32,
-        top: f32,
-        width: f32,
-        height: f32,
-        uv_left: f32,
-        uv_top: f32,
-        uv_width: f32,
-        uv_height: f32,
-        center: bool,
-    ) -> Self {
-        self.push_request(Request::Image(ImageRequest {
-            key,
-            left,
-            top,
-            width: Some(width),
-            height: Some(height),
-            uv_left: uv_left,
-            uv_top: uv_top,
-            uv_width: Some(uv_width),
-            uv_height: Some(uv_height),
-            center,
-        }))
+impl Requests {
+    /// Push image request with wrapping ImageRequest struct.
+    pub fn push_imgrq(self, imgrq: ImageRequest) -> Self {
+        self.push_request(Request::Image(imgrq))
     }
 }

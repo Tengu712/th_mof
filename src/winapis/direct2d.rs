@@ -182,6 +182,7 @@ impl D2DApplication {
         uv_top: f32,
         uv_width: f32,
         uv_height: f32,
+        alpha: f32,
         center: bool,
     ) {
         let (left, top) = if center {
@@ -205,7 +206,7 @@ impl D2DApplication {
             self.context.DrawBitmap(
                 &image.bitmap,
                 &dst_rect,
-                1.0,
+                alpha,
                 D2D1_BITMAP_INTERPOLATION_MODE_LINEAR,
                 &src_rect,
             )

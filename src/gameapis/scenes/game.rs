@@ -1,4 +1,8 @@
-use super::*;
+use super::super::{input::*, requests::*, scenes::*};
+
+pub enum Stage {
+    Bamboo,
+}
 
 pub enum GameState {
     Talking,
@@ -8,6 +12,7 @@ pub enum GameState {
 }
 
 pub struct GameScene {
+    pub stage: Stage,
     pub start: u32,
     pub count: u32,
     pub state: GameState,
@@ -20,6 +25,7 @@ impl GameScene {
     pub fn new() -> Scene {
         let rnd: u32 = rand::prelude::random();
         Scene::Game(Self {
+            stage: Stage::Bamboo,
             start: (rnd % 300) + 120,
             count: 0,
             state: GameState::Talking,
@@ -34,6 +40,12 @@ impl GameScene {
             GameState::Waiting => self.update_waiting(keystates),
             GameState::Shooting => self.update_shooting(keystates),
             GameState::Ending => self.update_ending(keystates),
+        }
+    }
+    /// A method to get ImgResID based on Stage.
+    pub fn get_imgresid(&self) -> ImgResID {
+        match self.stage {
+            Stage::Bamboo => ImgResID::StageBamboo,
         }
     }
 }
