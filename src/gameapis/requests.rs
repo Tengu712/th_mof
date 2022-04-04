@@ -6,6 +6,7 @@ use imagerequest::*;
 #[derive(Clone, Copy)]
 pub enum Request {
     NoRequest,
+    Reverse(bool),
     Image(ImageRequest),
 }
 
@@ -32,7 +33,7 @@ impl Requests {
     }
     /// Push request to array at count and incliment count.
     /// If count is bigger than length of array, nothing happens.
-    fn push_request(self, request: Request) -> Self {
+    pub fn push_request(self, request: Request) -> Self {
         if self.count >= self.array.len() {
             return self;
         }

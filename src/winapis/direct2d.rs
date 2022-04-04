@@ -1,3 +1,4 @@
+use std::ops::Mul;
 use windows::{
     core::Interface,
     Foundation::Numerics::*,
@@ -158,15 +159,15 @@ impl D2DApplication {
         unsafe { self.context.Clear(&D2D1_COLOR_F { r, g, b, a: 1.0 }) };
     }
 
-    /// Draw rect.
-    pub fn draw_rect(&self, brush: &ID2D1SolidColorBrush) {
-        let rect = D2D_RECT_F {
-            left: 0.0,
-            top: 0.0,
-            right: 50.0,
-            bottom: 50.0,
-        };
-        unsafe { self.context.FillRectangle(&rect, brush) };
+    /// Set matrix to reverse.
+    pub fn reverse(&self, onoff: bool, screen_width: f32) {
+        let mut mat_scl = Matrix3x2::identity();
+        let mut mat_trs = Matrix3x2::identity();
+        if onoff {
+            mat_scl.M11 = -1.0;
+            mat_trs.M31 = screen_width;
+        }
+        unsafe { self.context.SetTransform(&mat_scl.mul(mat_trs)) };
     }
 
     /// Draw Image.
@@ -209,26 +210,6 @@ impl D2DApplication {
                 &src_rect,
             )
         };
-    }
-
-    /// Create brush
-    pub fn create_brush(
-        &self,
-        r: f32,
-        g: f32,
-        b: f32,
-        a: f32,
-    ) -> Result<ID2D1SolidColorBrush, String> {
-        let color = D2D1_COLOR_F { r, g, b, a };
-        let brushproperties = D2D1_BRUSH_PROPERTIES {
-            opacity: 1.0,
-            transform: Matrix3x2::identity(),
-        };
-        Ok(unsafe {
-            self.context
-                .CreateSolidColorBrush(&color, &brushproperties)
-                .map_err(|e| e.to_string() + "\nFailed to create brush.")?
-        })
     }
 
     /// Create image

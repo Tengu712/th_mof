@@ -72,6 +72,7 @@ impl Application {
     /// Do requests of drawing image or.
     fn do_request(&self, request: &Request) -> Result<(), String> {
         match request {
+            Request::Reverse(n) => self.d2dapp.reverse(n.clone(), 1280.0),
             Request::Image(n) => {
                 let image = self
                     .images
