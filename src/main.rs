@@ -48,7 +48,7 @@ impl Application {
     /// Run the game.
     fn run(self) -> Result<(), String> {
         let mut keystates = KeyStates::new();
-        let mut scene = TitleScene::new();
+        let mut scene = title::TitleScene::new();
         while !self.winapp.do_event() {
             keystates = keystates.detect(KeyCode::Z).detect(KeyCode::L);
             let (next, reqs) = match scene {

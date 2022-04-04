@@ -1,4 +1,4 @@
-use super::super::{input::*, requests::*, scenes::*};
+use super::super::{character::*, input::*, requests::*, resource::*, scenes::*};
 
 pub enum Stage {
     Bamboo,
