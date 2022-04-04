@@ -3,12 +3,13 @@ use super::{
         input::*,
         requests::{imagerequest::*, *},
         scenes::*,
+        *,
     },
     game::*,
 };
 
 impl GameScene {
-    /// Background, characters. 
+    /// Background, characters.
     pub fn update_talking(self, keystates: &KeyStates) -> (Scene, Requests) {
         let reqs = Requests::new()
             .push_imgrq(ImageRequest::new(self.get_imgresid()))
@@ -16,15 +17,18 @@ impl GameScene {
             .push_request(Request::Reverse(true))
             .push_imgrq(self.chara_2p.get_imgrq())
             .push_request(Request::Reverse(false));
-        let (state, count) = if keystates.z == 1 || keystates.l == 1 {
-            (GameState::Waiting, 0)
+        let count = self.count + indicator_bool(keystates.z == 1 || keystates.l == 1);
+        let state = if self.get_dialogue() {
+            GameState::Waiting
         } else {
-            (GameState::Talking, self.count)
+            GameState::Talking
         };
         (
             Scene::Game(Self {
                 stage: self.stage,
+                mode: self.mode,
                 start: self.start,
+                winner: 0,
                 count,
                 state,
                 chara_1p: self.chara_1p,
@@ -32,5 +36,16 @@ impl GameScene {
             }),
             reqs,
         )
+    }
+    /// Get dialogue.
+    fn get_dialogue(&self) -> bool {
+        match self.mode {
+            Mode::Story(n) => match n {
+                1 => match self.count {
+                    _ => true,
+                },
+                _ => true,
+            },
+        }
     }
 }

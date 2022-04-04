@@ -20,12 +20,21 @@ impl GameScene {
             .push_request(Request::Reverse(false));
         let chara_1p = self.chara_1p.update(keystates.z == 1);
         let chara_2p = self.chara_2p.update(keystates.l == 1);
+        let (state, winner, count) = if chara_1p.is_shot() && !chara_2p.is_shot() {
+            (GameState::Ending, 1, 0)
+        } else if !chara_1p.is_shot() && chara_2p.is_shot() {
+            (GameState::Ending, 2, 0)
+        } else {
+            (self.state, 0, self.count + 1)
+        };
         (
             Scene::Game(Self {
                 stage: self.stage,
+                mode: self.mode,
                 start: self.start,
-                count: self.count + 1,
-                state: GameState::Shooting,
+                winner,
+                count,
+                state,
                 chara_1p,
                 chara_2p,
             }),

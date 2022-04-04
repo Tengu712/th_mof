@@ -30,7 +30,9 @@ impl GameScene {
             (
                 Scene::Game(Self {
                     stage: self.stage,
+                    mode: self.mode,
                     start: self.start,
+                    winner: self.winner,
                     count: 0,
                     state: GameState::Ending,
                     chara_1p: self.chara_1p,

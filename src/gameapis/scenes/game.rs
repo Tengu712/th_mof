@@ -1,5 +1,10 @@
 use super::super::{character::*, input::*, requests::*, resource::*, scenes::*};
 
+/// A enum for classfying mode.
+pub enum Mode {
+    Story(u32),
+}
+
 pub enum Stage {
     Bamboo,
 }
@@ -13,7 +18,9 @@ pub enum GameState {
 
 pub struct GameScene {
     pub stage: Stage,
+    pub mode: Mode,
     pub start: u32,
+    pub winner: u32,
     pub count: u32,
     pub state: GameState,
     pub chara_1p: Character,
@@ -26,7 +33,9 @@ impl GameScene {
         let rnd: u32 = rand::prelude::random();
         Scene::Game(Self {
             stage: Stage::Bamboo,
+            mode: Mode::Story(1),
             start: (rnd % 300) + 120,
+            winner: 0,
             count: 0,
             state: GameState::Talking,
             chara_1p: Character::new(CharaID::Udonge),
