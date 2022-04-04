@@ -1,6 +1,8 @@
 pub mod imagerequest;
+pub mod textrequest;
 
 use imagerequest::*;
+use textrequest::*;
 
 /// A enum for request of drawing image or.
 #[derive(Clone, Copy)]
@@ -8,6 +10,7 @@ pub enum Request {
     NoRequest,
     Reverse(bool),
     Image(ImageRequest),
+    Text(TextRequest),
 }
 
 const NUM_REQUESTS: usize = 20;

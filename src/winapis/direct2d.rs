@@ -1,6 +1,6 @@
 use std::ops::Mul;
 use windows::{
-    core::Interface,
+    core::{IUnknown, Interface},
     Foundation::Numerics::*,
     Win32::{
         Foundation::*,
@@ -8,6 +8,7 @@ use windows::{
             Direct2D::{Common::*, *},
             Direct3D::*,
             Direct3D11::*,
+            DirectWrite::*,
             Dxgi::{Common::*, *},
             Imaging::*,
         },
@@ -19,6 +20,7 @@ use windows::{
 pub struct D2DApplication {
     context: ID2D1DeviceContext,
     swapchain: IDXGISwapChain1,
+    dwfactory: IDWriteFactory,
 }
 
 /// Struct to reference image data.
@@ -125,8 +127,18 @@ impl D2DApplication {
                 .map_err(|e| e.to_string() + "\nFailed to create bitmap from dxgisurface.")?
         };
         unsafe { context.SetTarget(bitmap) };
+        // Create DirectWrite Factory
+        let p_dwfactory = &unsafe {
+            DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, &IDWriteFactory::IID)
+                .map_err(|e| e.to_string() + "\nFailed to create dwrite factory.")?
+        } as *const IUnknown as *const IDWriteFactory;
+        let dwfactory = unsafe { &*p_dwfactory };
         // Finish
-        Ok(Self { context, swapchain })
+        Ok(Self {
+            context,
+            swapchain,
+            dwfactory: dwfactory.clone(),
+        })
     }
 
     /// Call this at the first of drawing
@@ -211,6 +223,85 @@ impl D2DApplication {
                 &src_rect,
             )
         };
+    }
+
+    /// Draw text with size and rgba. 
+    /// The argument, alignment, 0, 1, 2 is left, center, right.
+    pub fn draw_text(
+        &self,
+        text: &str,
+        left: f32,
+        top: f32,
+        right: f32,
+        bottom: f32,
+        size: f32,
+        alignment: u32,
+        r: f32,
+        g: f32,
+        b: f32,
+        a: f32,
+    ) -> Result<(), String> {
+        let format = unsafe {
+            self.dwfactory
+                .CreateTextFormat(
+                    "メイリオ",
+                    None,
+                    DWRITE_FONT_WEIGHT_NORMAL,
+                    DWRITE_FONT_STYLE_NORMAL,
+                    DWRITE_FONT_STRETCH_NORMAL,
+                    size * 72.0 / 96.0,
+                    "ja-JP",
+                )
+                .map_err(|e| e.to_string() + "\nFailed to create text format.")?
+        };
+        let dw_align = match alignment {
+            1 => DWRITE_TEXT_ALIGNMENT_CENTER,
+            2 => DWRITE_TEXT_ALIGNMENT_TRAILING,
+            _ => DWRITE_TEXT_ALIGNMENT_LEADING,
+        };
+        unsafe {
+            format
+                .SetTextAlignment(dw_align)
+                .map_err(|e| e.to_string() + "\nFailed to set text alignment.")?
+        };
+        let brush = self.create_brush(r, g, b, a)?;
+        unsafe {
+            self.context.DrawText(
+                text,
+                text.chars().count() as u32,
+                &format,
+                &D2D_RECT_F {
+                    left,
+                    top,
+                    right,
+                    bottom,
+                },
+                &brush,
+                D2D1_DRAW_TEXT_OPTIONS_NONE,
+                DWRITE_MEASURING_MODE_NATURAL,
+            )
+        };
+        Ok(())
+    }
+
+    /// Create brush
+    pub fn create_brush(
+        &self,
+        r: f32,
+        g: f32,
+        b: f32,
+        a: f32,
+    ) -> Result<ID2D1SolidColorBrush, String> {
+        let color = D2D1_COLOR_F { r, g, b, a };
+        let brushproperties = D2D1_BRUSH_PROPERTIES {
+            opacity: 1.0,
+            transform: Matrix3x2::identity(),
+        };
+        Ok(unsafe {
+            self.context
+                .CreateSolidColorBrush(&color, &brushproperties)
+                .map_err(|e| e.to_string() + "\nFailed to create brush.")?
+        })
     }
 
     /// Create image

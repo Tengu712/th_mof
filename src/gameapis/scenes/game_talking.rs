@@ -1,7 +1,7 @@
 use super::{
     super::{
         input::*,
-        requests::{imagerequest::*, *},
+        requests::{imagerequest::*, textrequest::*, *},
         scenes::*,
         *,
     },
@@ -10,18 +10,27 @@ use super::{
 
 impl GameScene {
     /// Background, characters.
+    /// If dialogue is none, go to waiting state.
     pub fn update_talking(self, keystates: &KeyStates) -> (Scene, Requests) {
-        let reqs = Requests::new()
+        let mut reqs = Requests::new()
             .push_imgrq(ImageRequest::new(self.get_imgresid()))
             .push_imgrq(self.chara_1p.get_imgrq())
             .push_request(Request::Reverse(true))
             .push_imgrq(self.chara_2p.get_imgrq())
             .push_request(Request::Reverse(false));
         let count = self.count + indicator_bool(keystates.z == 1 || keystates.l == 1);
-        let state = if self.get_dialogue() {
-            GameState::Waiting
-        } else {
-            GameState::Talking
+        let text = self.get_dialogue();
+        let state = match text {
+            Some(n) => {
+                reqs = reqs.push_txtrq(
+                    TextRequest::new(n)
+                        .ltrb(0.0, 0.0, 1280.0, 720.0)
+                        .rgba(0.0, 0.0, 0.0, 1.0)
+                        .set_align(1),
+                );
+                GameState::Talking
+            }
+            None => GameState::Waiting,
         };
         (
             Scene::Game(Self {
@@ -38,13 +47,14 @@ impl GameScene {
         )
     }
     /// Get dialogue.
-    fn get_dialogue(&self) -> bool {
+    fn get_dialogue(&self) -> Option<&str> {
         match self.mode {
             Mode::Story(n) => match n {
                 1 => match self.count {
-                    _ => true,
+                    0 => Some("あいうえお"),
+                    _ => None,
                 },
-                _ => true,
+                _ => None,
             },
         }
     }

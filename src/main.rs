@@ -97,6 +97,22 @@ impl Application {
                     n.alpha, n.center,
                 );
             }
+            Request::Text(n) => {
+                let text = String::from_utf8_lossy(&n.text);
+                self.d2dapp.draw_text(
+                    text.into_owned().as_str(),
+                    n.left,
+                    n.top,
+                    n.right,
+                    n.bottom,
+                    n.size,
+                    n.alignment,
+                    n.r,
+                    n.g,
+                    n.b,
+                    n.a,
+                )?;
+            }
             _ => (),
         }
         Ok(())
