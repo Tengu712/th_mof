@@ -1,9 +1,9 @@
 use windows::{
-    core::PCSTR,
+    core::PCWSTR,
     Win32::{
         Foundation::*,
         Graphics::Gdi::ValidateRect,
-        System::LibraryLoader::GetModuleHandleA,
+        System::LibraryLoader::GetModuleHandleW,
         UI::{Input::KeyboardAndMouse::*, WindowsAndMessaging::*},
     },
 };
@@ -41,7 +41,7 @@ extern "system" fn wndproc(window: HWND, message: u32, wparam: WPARAM, lparam: L
                 PostQuitMessage(0);
                 LRESULT(0)
             }
-            _ => DefWindowProcA(window, message, wparam, lparam),
+            _ => DefWindowProcW(window, message, wparam, lparam),
         }
     }
 }
@@ -63,21 +63,26 @@ impl WindowsApplication {
             (WS_POPUP, SW_SHOWMAXIMIZED)
         };
         // Get instance handle
-        let instance = unsafe { GetModuleHandleA(None) };
+        let instance = unsafe { GetModuleHandleW(None) };
         if instance.0 == 0 {
             return Err("Failed to get instance handle.".to_owned());
         }
         // Register window class
-        let wcex = WNDCLASSEXA {
-            cbSize: std::mem::size_of::<WNDCLASSEXA>() as u32,
+        let wcex = WNDCLASSEXW {
+            cbSize: std::mem::size_of::<WNDCLASSEXW>() as u32,
             style: CS_HREDRAW | CS_VREDRAW,
             lpfnWndProc: Some(wndproc),
             hInstance: instance,
             hCursor: unsafe { LoadCursorW(None, IDC_ARROW) },
-            lpszClassName: PCSTR(b"RustWindowClass\0".as_ptr()),
+            lpszClassName: PCWSTR(
+                "RustWindowClass\0"
+                    .encode_utf16()
+                    .collect::<Vec<u16>>()
+                    .as_ptr(),
+            ),
             ..Default::default()
         };
-        if unsafe { RegisterClassExA(&wcex) == 0 } {
+        if unsafe { RegisterClassExW(&wcex) == 0 } {
             return Err("Failed to register window class.".to_owned());
         }
         // Adjust window size
@@ -90,7 +95,7 @@ impl WindowsApplication {
         unsafe { AdjustWindowRectEx(&mut window_rect, window_style, false, Default::default()) };
         // Create window and get window handle
         let hwnd = unsafe {
-            CreateWindowExA(
+            CreateWindowExW(
                 Default::default(),
                 "RustWindowClass",
                 title,
@@ -123,13 +128,13 @@ impl WindowsApplication {
     pub fn do_event(&self) -> bool {
         let mut message = MSG::default();
         loop {
-            if unsafe { PeekMessageA(&mut message, None, 0, 0, PM_REMOVE).into() } {
+            if unsafe { PeekMessageW(&mut message, None, 0, 0, PM_REMOVE).into() } {
                 if message.message == WM_QUIT {
                     return true;
                 }
                 unsafe {
                     TranslateMessage(&message);
-                    DispatchMessageA(&message);
+                    DispatchMessageW(&message);
                 }
                 continue;
             }

@@ -16,7 +16,7 @@ struct Application {
 impl Application {
     /// Constructor.
     fn new() -> Result<Self, String> {
-        let winapp = WindowsApplication::new("Window title", 1280, 720, true)?;
+        let winapp = WindowsApplication::new("須臾を極む", 1280, 720, true)?;
         let d2dapp = D2DApplication::new(&winapp)?;
         let mut images = HashMap::new();
         // UI
