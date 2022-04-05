@@ -115,7 +115,7 @@ impl GameScene {
                     (0, State::Shooting, 0)
                 } else if chara_1p.is_shot() && !chara_2p.is_shot() {
                     (2, State::Ending, 0)
-                } else if !chara_1p.is_shot() && !chara_2p.is_shot() {
+                } else if !chara_1p.is_shot() && chara_2p.is_shot() {
                     (1, State::Ending, 0)
                 } else if chara_1p.is_shot() && chara_2p.is_shot() {
                     (3, State::Ending, 0)
