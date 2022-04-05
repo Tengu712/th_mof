@@ -37,14 +37,25 @@ impl Requests {
     /// Push request to array at count and incliment count.
     /// If count is bigger than length of array, nothing happens.
     pub fn push_request(self, request: Request) -> Self {
-        if self.count >= self.array.len() {
-            return self;
+        match request {
+            Request::NoRequest => self,
+            _ if self.count >= self.array.len() => self,
+            _ => {
+                let mut cloned = self.array.clone();
+                cloned[self.count] = request;
+                Self {
+                    count: self.count + 1,
+                    array: cloned,
+                }
+            }
         }
-        let mut cloned = self.array.clone();
-        cloned[self.count] = request;
-        Self {
-            count: self.count + 1,
-            array: cloned,
+    }
+    /// Join two requests.
+    pub fn join(self, requests: Requests) -> Self {
+        let mut origin = self;
+        for i in requests.get_array().iter() {
+            origin = origin.push_request(*i);
         }
+        origin
     }
 }

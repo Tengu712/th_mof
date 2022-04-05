@@ -1,6 +1,7 @@
 use super::{requests::imagerequest::*, resource::*, *};
 
 /// A enum for identifing characters.
+#[derive(Clone)]
 pub enum CharaID {
     Udonge,
     Tei,
@@ -18,14 +19,14 @@ impl Character {
         Self { id, shoot_count: 0 }
     }
     /// A method for abstracting updating shoot count.
-    pub fn update(self, shoot: bool) -> Self {
+    pub fn update(&self, shoot: bool) -> Self {
         let end = self.get_end_of_shot();
         let shoot_count = (self.shoot_count + 1)
             * indicator_u32(self.shoot_count)
             * indicator_bool(self.shoot_count > 0 && self.shoot_count < end)
             + indicator_bool(shoot) * indicator_bool(self.shoot_count == 0);
         Self {
-            id: self.id,
+            id: self.id.clone(),
             shoot_count,
         }
     }
