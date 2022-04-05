@@ -100,51 +100,6 @@ impl GameScene {
             },
         }
     }
-    /// A method to get next scene.
-    fn get_next_scene(self, count: u32, chara_1p: Character, chara_2p: Character) -> Scene {
-        let (winner, state, count) = match self.state {
-            State::Talking => {
-                if count == 2 {
-                    (0, State::Waiting, 0)
-                } else {
-                    (0, self.state, count)
-                }
-            }
-            State::Waiting => {
-                if count >= self.start {
-                    (0, State::Shooting, 0)
-                } else if chara_1p.is_shot() && !chara_2p.is_shot() {
-                    (2, State::Ending, 0)
-                } else if !chara_1p.is_shot() && chara_2p.is_shot() {
-                    (1, State::Ending, 0)
-                } else if chara_1p.is_shot() && chara_2p.is_shot() {
-                    (3, State::Ending, 0)
-                } else {
-                    (0, self.state, count)
-                }
-            }
-            State::Shooting => {
-                if chara_1p.is_shot() && !chara_2p.is_shot() {
-                    (1, State::Ending, 0)
-                } else if !chara_1p.is_shot() && chara_2p.is_shot() {
-                    (2, State::Ending, 0)
-                } else {
-                    (0, self.state, count)
-                }
-            }
-            State::Ending => (self.winner, self.state, count),
-        };
-        Scene::Game(Self {
-            stage: self.stage,
-            mode: self.mode,
-            start: self.start,
-            winner,
-            state,
-            chara_1p,
-            chara_2p,
-            count,
-        })
-    }
     /// A method to get mask if it needs.
     fn get_mask(&self) -> Request {
         match self.state {
@@ -195,5 +150,50 @@ impl GameScene {
         match self.stage {
             Stage::Bamboo => ImgResID::StageBamboo,
         }
+    }
+    /// A method to get next scene.
+    fn get_next_scene(self, count: u32, chara_1p: Character, chara_2p: Character) -> Scene {
+        let (winner, state, count) = match self.state {
+            State::Talking => {
+                if count == 2 {
+                    (0, State::Waiting, 0)
+                } else {
+                    (0, self.state, count)
+                }
+            }
+            State::Waiting => {
+                if count >= self.start {
+                    (0, State::Shooting, 0)
+                } else if chara_1p.is_shot() && !chara_2p.is_shot() {
+                    (2, State::Ending, 0)
+                } else if !chara_1p.is_shot() && chara_2p.is_shot() {
+                    (1, State::Ending, 0)
+                } else if chara_1p.is_shot() && chara_2p.is_shot() {
+                    (3, State::Ending, 0)
+                } else {
+                    (0, self.state, count)
+                }
+            }
+            State::Shooting => {
+                if chara_1p.is_shot() && !chara_2p.is_shot() {
+                    (1, State::Ending, 0)
+                } else if !chara_1p.is_shot() && chara_2p.is_shot() {
+                    (2, State::Ending, 0)
+                } else {
+                    (0, self.state, count)
+                }
+            }
+            State::Ending => (self.winner, self.state, count),
+        };
+        Scene::Game(Self {
+            stage: self.stage,
+            mode: self.mode,
+            start: self.start,
+            winner,
+            state,
+            chara_1p,
+            chara_2p,
+            count,
+        })
     }
 }
