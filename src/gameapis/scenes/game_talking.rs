@@ -10,20 +10,19 @@ use super::{
 };
 
 impl GameScene {
-    /// Background, characters.
+    /// Background, characters, speech bubble, text.
     /// If dialogue is none, go to waiting state.
     pub fn update_talking(self, keystates: &KeyStates) -> (Scene, Requests) {
-        let mut reqs = Requests::new()
+        let reqs = Requests::new()
             .push_imgrq(ImageRequest::new(self.get_imgresid()))
             .push_imgrq(self.chara_1p.get_imgrq())
             .push_request(Request::Reverse(true))
             .push_imgrq(self.chara_2p.get_imgrq())
             .push_request(Request::Reverse(false));
         let count = self.count + indicator_bool(keystates.z == 1 || keystates.l == 1);
-        let text = self.get_dialogue();
-        let state = match text {
+        let (state, reqs) = match self.get_dialogue() {
             Some((s, b)) => {
-                reqs = reqs
+                let reqs = reqs
                     .push_request(Request::Reverse(b))
                     .push_imgrq(
                         ImageRequest::new(ImgResID::SpeechBubble)
@@ -38,9 +37,9 @@ impl GameScene {
                             .set_size(50.0)
                             .set_align(1),
                     );
-                GameState::Talking
+                (GameState::Talking, reqs)
             }
-            None => GameState::Waiting,
+            None => (GameState::Waiting, reqs),
         };
         (
             Scene::Game(Self {
