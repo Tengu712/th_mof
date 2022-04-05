@@ -35,39 +35,39 @@ impl ImageRequest {
     }
     /// A method to set left and top.
     pub fn lt(self, left: f32, top: f32) -> Self {
-        let mut cloned = self.clone();
-        cloned.left = left;
-        cloned.top = top;
-        cloned
+        let mut self_mut = self;
+        self_mut.left = left;
+        self_mut.top = top;
+        self_mut
     }
     /// A method to set width and height.
     pub fn wh(self, width: f32, height: f32) -> Self {
-        let mut cloned = self.clone();
-        cloned.width = Some(width);
-        cloned.height = Some(height);
-        cloned
+        let mut self_mut = self;
+        self_mut.width = Some(width);
+        self_mut.height = Some(height);
+        self_mut
     }
     /// A method to set uv. 
     /// uv_width and uv_height will be same as width and height.
     pub fn uv(self, uv_left: f32, uv_top: f32) -> Self {
-        let mut cloned = self.clone();
-        cloned.uv_left = uv_left;
-        cloned.uv_top = uv_top;
-        cloned.uv_width = cloned.width;
-        cloned.uv_height = cloned.height;
-        cloned
+        let mut self_mut = self;
+        self_mut.uv_left = uv_left;
+        self_mut.uv_top = uv_top;
+        self_mut.uv_width = self_mut.width;
+        self_mut.uv_height = self_mut.height;
+        self_mut
     }
     /// A method to set alpha.
     pub fn alph(self, alpha: f32) -> Self {
-        let mut cloned = self.clone();
-        cloned.alpha = alpha;
-        cloned
+        let mut self_mut = self;
+        self_mut.alpha = alpha;
+        self_mut
     }
     /// A method to set center.
     pub fn cntr(self, center: bool) -> Self {
-        let mut cloned = self.clone();
-        cloned.center = center;
-        cloned
+        let mut self_mut = self;
+        self_mut.center = center;
+        self_mut
     }
 }
 

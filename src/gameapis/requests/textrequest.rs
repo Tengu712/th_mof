@@ -45,33 +45,33 @@ impl TextRequest {
     }
     /// A method to set left, top, right and bottom.
     pub fn ltrb(self, left: f32, top: f32, right: f32, bottom: f32) -> Self {
-        let mut cloned = self.clone();
-        cloned.left = left;
-        cloned.top = top;
-        cloned.right = right;
-        cloned.bottom = bottom;
-        cloned
+        let mut self_mut = self;
+        self_mut.left = left;
+        self_mut.top = top;
+        self_mut.right = right;
+        self_mut.bottom = bottom;
+        self_mut
     }
     /// A method to set font size.
     pub fn set_size(self, size: f32) -> Self {
-        let mut cloned = self.clone();
-        cloned.size = size;
-        cloned
+        let mut self_mut = self;
+        self_mut.size = size;
+        self_mut
     }
     /// A method to set alignment.
     pub fn set_align(self, alignment: u32) -> Self {
-        let mut cloned = self.clone();
-        cloned.alignment = alignment;
-        cloned
+        let mut self_mut = self;
+        self_mut.alignment = alignment;
+        self_mut
     }
     /// A method to set literal color.
     pub fn rgba(self, r: f32, g: f32, b: f32, a: f32) -> Self {
-        let mut cloned = self.clone();
-        cloned.r = r;
-        cloned.g = g;
-        cloned.b = b;
-        cloned.a = a;
-        cloned
+        let mut self_mut = self;
+        self_mut.r = r;
+        self_mut.g = g;
+        self_mut.b = b;
+        self_mut.a = a;
+        self_mut
     }
 }
 

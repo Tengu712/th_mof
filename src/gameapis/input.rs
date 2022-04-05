@@ -20,11 +20,11 @@ impl KeyStates {
     }
     /// Detect key state and return self state.
     pub fn detect(self, code: KeyCode) -> Self {
-        let mut cloned = self.clone();
+        let mut self_mut = self;
         match code {
-            KeyCode::Z => cloned.z = get_next_keystate(0x5A, cloned.z),
-            KeyCode::L => cloned.l = get_next_keystate(0x4C, cloned.l),
+            KeyCode::Z => self_mut.z = get_next_keystate(0x5A, self_mut.z),
+            KeyCode::L => self_mut.l = get_next_keystate(0x4C, self_mut.l),
         };
-        cloned
+        self_mut
     }
 }

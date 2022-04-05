@@ -41,11 +41,11 @@ impl Requests {
             Request::NoRequest => self,
             _ if self.count >= self.array.len() => self,
             _ => {
-                let mut cloned = self.array.clone();
-                cloned[self.count] = request;
+                let mut array_mut = self.array;
+                array_mut[self.count] = request;
                 Self {
                     count: self.count + 1,
-                    array: cloned,
+                    array: array_mut,
                 }
             }
         }
