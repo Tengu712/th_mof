@@ -1,7 +1,7 @@
 pub mod gameapis;
 pub mod winapis;
 
-use gameapis::{input::*, requests::*, resource::*, scenes::*};
+use gameapis::{dialogue::*, input::*, requests::*, resource::*, scenes::*};
 use std::collections::HashMap;
 use winapis::{direct2d::*, winapi::*};
 
@@ -10,6 +10,7 @@ struct Application {
     winapp: WindowsApplication,
     d2dapp: D2DApplication,
     images: HashMap<ImgResID, Image>,
+    dialogue: Dialogue,
 }
 
 impl Application {
@@ -57,10 +58,13 @@ impl Application {
                 "C:/Users/kazuki/OneDrive/touhou/illust/2022spring/game/stage_bamboo.png",
             )?,
         );
+        // Dialogue
+        let dialogue = Dialogue::new("res/dialogue.txt")?;
         Ok(Self {
             winapp,
             d2dapp,
             images,
+            dialogue,
         })
     }
     /// **[Side Effect]**
@@ -72,7 +76,7 @@ impl Application {
             keystates = keystates.detect(KeyCode::Z).detect(KeyCode::L);
             let (next, reqs) = match scene {
                 Scene::Title(n) => n.update(&keystates),
-                Scene::Game(n) => n.update(&keystates),
+                Scene::Game(n) => n.update(&keystates, &self.dialogue),
             };
             scene = next;
             self.d2dapp.begin_draw();

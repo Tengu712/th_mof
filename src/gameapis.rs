@@ -1,4 +1,5 @@
 pub mod character;
+pub mod dialogue;
 pub mod input;
 pub mod requests;
 pub mod resource;

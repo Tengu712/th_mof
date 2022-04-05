@@ -1,5 +1,6 @@
 use super::super::{
     character::*,
+    dialogue::*,
     input::*,
     requests::{imagerequest::*, textrequest::*, *},
     resource::*,
@@ -14,6 +15,7 @@ struct InputInfo {
 }
 
 /// A enum for classfying mode.
+#[derive(PartialEq)]
 pub enum Mode {
     Story(u32),
 }
@@ -58,13 +60,13 @@ impl GameScene {
         })
     }
     /// Update game scene. Return the next state and requests.
-    pub fn update(self, keystates: &KeyStates) -> (Scene, Requests) {
+    pub fn update(self, keystates: &KeyStates, dialogue: &Dialogue) -> (Scene, Requests) {
         let count = self.update_count(keystates);
         let input = self.get_input(keystates);
         let chara_1p = self.chara_1p.update(input.shot_1p);
         let chara_2p = self.chara_2p.update(input.shot_2p);
         let mask = self.get_mask();
-        let text = self.get_text();
+        let text = self.get_text(dialogue);
         let reqs = Requests::new()
             .push_imgrq(ImageRequest::new(self.get_bg_imgresid()))
             .push_request(mask)
@@ -109,9 +111,9 @@ impl GameScene {
         }
     }
     /// A method to get dialogue text.
-    fn get_text(&self) -> Requests {
+    fn get_text(&self, dialogue: &Dialogue) -> Requests {
         match self.state {
-            State::Talking => match self.get_dialogue() {
+            State::Talking => match dialogue.get_dialogue(&self.mode, &self.count) {
                 Some((s, b)) => Requests::new()
                     .push_request(Request::Reverse(b))
                     .push_imgrq(
@@ -121,7 +123,7 @@ impl GameScene {
                     )
                     .push_request(Request::Reverse(false))
                     .push_txtrq(
-                        TextRequest::new(s)
+                        TextRequest::new(s.as_str())
                             .ltrb(0.0, 160.0, 1280.0, 720.0)
                             .rgba(0.0, 0.0, 0.0, 1.0)
                             .set_size(50.0)
@@ -130,19 +132,6 @@ impl GameScene {
                 None => Requests::new(),
             },
             _ => Requests::new(),
-        }
-    }
-    /// Get dialogue. Return (&str, bool). The bool is true, 2p is speaking.
-    fn get_dialogue(&self) -> Option<(&str, bool)> {
-        match self.mode {
-            Mode::Story(n) => match n {
-                1 => match self.count {
-                    0 => Some(("鈴仙・U・イナバ", false)),
-                    1 => Some(("因幡てゐ", true)),
-                    _ => None,
-                },
-                _ => None,
-            },
         }
     }
     /// A method to get ImgResID based on Stage.
