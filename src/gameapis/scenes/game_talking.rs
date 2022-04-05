@@ -22,15 +22,17 @@ impl GameScene {
         let count = self.count + indicator_bool(keystates.z == 1 || keystates.l == 1);
         let text = self.get_dialogue();
         let state = match text {
-            Some(n) => {
+            Some((s, b)) => {
                 reqs = reqs
+                    .push_request(Request::Reverse(b))
                     .push_imgrq(
                         ImageRequest::new(ImgResID::SpeechBubble)
                             .lt(640.0, 180.0)
                             .cntr(true),
                     )
+                    .push_request(Request::Reverse(false))
                     .push_txtrq(
-                        TextRequest::new(n)
+                        TextRequest::new(s)
                             .ltrb(0.0, 160.0, 1280.0, 720.0)
                             .rgba(0.0, 0.0, 0.0, 1.0)
                             .set_size(50.0)
@@ -54,12 +56,13 @@ impl GameScene {
             reqs,
         )
     }
-    /// Get dialogue.
-    fn get_dialogue(&self) -> Option<&str> {
+    /// Get dialogue. Return (&str, bool). The bool is true, 2p is speaking.
+    fn get_dialogue(&self) -> Option<(&str, bool)> {
         match self.mode {
             Mode::Story(n) => match n {
                 1 => match self.count {
-                    0 => Some("あいうえお"),
+                    0 => Some(("鈴仙・U・イナバ", false)),
+                    1 => Some(("因幡てゐ", true)),
                     _ => None,
                 },
                 _ => None,
