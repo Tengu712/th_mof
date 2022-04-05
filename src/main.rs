@@ -18,6 +18,13 @@ impl Application {
         let winapp = WindowsApplication::new("Window title", 1280, 720, true)?;
         let d2dapp = D2DApplication::new(&winapp)?;
         let mut images = HashMap::new();
+        // UI
+        images.insert(
+            ImgResID::SpeechBubble,
+            d2dapp.create_image_from_file(
+                "C:/Users/kazuki/OneDrive/touhou/illust/2022spring/game/speechbubble.png",
+            )?,
+        );
         // Character
         images.insert(
             ImgResID::Udonge,

@@ -2,6 +2,7 @@ use super::{
     super::{
         input::*,
         requests::{imagerequest::*, textrequest::*, *},
+        resource::*,
         scenes::*,
         *,
     },
@@ -22,12 +23,19 @@ impl GameScene {
         let text = self.get_dialogue();
         let state = match text {
             Some(n) => {
-                reqs = reqs.push_txtrq(
-                    TextRequest::new(n)
-                        .ltrb(0.0, 0.0, 1280.0, 720.0)
-                        .rgba(0.0, 0.0, 0.0, 1.0)
-                        .set_align(1),
-                );
+                reqs = reqs
+                    .push_imgrq(
+                        ImageRequest::new(ImgResID::SpeechBubble)
+                            .lt(640.0, 180.0)
+                            .cntr(true),
+                    )
+                    .push_txtrq(
+                        TextRequest::new(n)
+                            .ltrb(0.0, 160.0, 1280.0, 720.0)
+                            .rgba(0.0, 0.0, 0.0, 1.0)
+                            .set_size(50.0)
+                            .set_align(1),
+                    );
                 GameState::Talking
             }
             None => GameState::Waiting,
