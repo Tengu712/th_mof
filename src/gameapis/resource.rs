@@ -2,6 +2,7 @@
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ImgResID {
     SpeechBubble,
+    StageTitleBamboo,
     Udonge,
     Tei,
     Black,

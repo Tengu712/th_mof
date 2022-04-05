@@ -26,6 +26,12 @@ impl Application {
                 "C:/Users/kazuki/OneDrive/touhou/illust/2022spring/game/speechbubble.png",
             )?,
         );
+        images.insert(
+            ImgResID::StageTitleBamboo,
+            d2dapp.create_image_from_file(
+                "C:/Users/kazuki/OneDrive/touhou/illust/2022spring/game/stagetitle_bamboo.png",
+            )?,
+        );
         // Character
         images.insert(
             ImgResID::Udonge,

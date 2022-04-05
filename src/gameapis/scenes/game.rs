@@ -27,6 +27,7 @@ pub enum Stage {
 
 /// A enum for classfying state.
 pub enum State {
+    Titling,
     Talking,
     Waiting,
     Shooting,
@@ -53,7 +54,7 @@ impl GameScene {
             mode: Mode::Story(1),
             start: (rnd % 300) + 120,
             winner: 0,
-            state: State::Talking,
+            state: State::Titling,
             chara_1p: Character::new(CharaID::Udonge),
             chara_2p: Character::new(CharaID::Tei),
             count: 0,
@@ -65,16 +66,16 @@ impl GameScene {
         let input = self.get_input(keystates);
         let chara_1p = self.chara_1p.update(input.shot_1p);
         let chara_2p = self.chara_2p.update(input.shot_2p);
-        let mask = self.get_mask();
-        let text = self.get_text(dialogue);
+        let mask_req = self.get_mask();
+        let ui_reqs = self.get_ui(dialogue);
         let reqs = Requests::new()
             .push_imgrq(ImageRequest::new(self.get_bg_imgresid()))
-            .push_request(mask)
+            .push_request(mask_req)
             .push_imgrq(chara_1p.get_imgrq())
             .push_request(Request::Reverse(true))
             .push_imgrq(chara_2p.get_imgrq())
             .push_request(Request::Reverse(false))
-            .join(text);
+            .join(ui_reqs);
         let next = self.get_next_scene(count, chara_1p, chara_2p);
         (next, reqs)
     }
@@ -111,8 +112,20 @@ impl GameScene {
         }
     }
     /// A method to get dialogue text.
-    fn get_text(&self, dialogue: &Dialogue) -> Requests {
+    fn get_ui(&self, dialogue: &Dialogue) -> Requests {
         match self.state {
+            State::Titling => {
+                if self.count >= 30 {
+                    Requests::new().push_imgrq(
+                        ImageRequest::new(self.get_title_imgresid())
+                            .lt(640.0, 300.0)
+                            .cntr(true)
+                            .alph(1.0 - min(max((self.count as f32 - 80.0) / 60.0, 0.0), 1.0)),
+                    )
+                } else {
+                    Requests::new()
+                }
+            }
             State::Talking => match dialogue.get_dialogue(&self.mode, &self.count) {
                 Some((s, b)) => Requests::new()
                     .push_request(Request::Reverse(b))
@@ -134,15 +147,28 @@ impl GameScene {
             _ => Requests::new(),
         }
     }
-    /// A method to get ImgResID based on Stage.
+    /// A private method to get stage bg ImgResID based on Stage.
     fn get_bg_imgresid(&self) -> ImgResID {
         match self.stage {
             Stage::Bamboo => ImgResID::StageBamboo,
         }
     }
+    /// A private method to get stage title ImgResID based on Stage.
+    fn get_title_imgresid(&self) -> ImgResID {
+        match self.stage {
+            Stage::Bamboo => ImgResID::StageTitleBamboo,
+        }
+    }
     /// A method to get next scene.
     fn get_next_scene(self, count: u32, chara_1p: Character, chara_2p: Character) -> Scene {
         let (winner, state, count) = match self.state {
+            State::Titling => {
+                if count >= 180 {
+                    (0, State::Talking, 0)
+                } else {
+                    (0, self.state, count)
+                }
+            }
             State::Talking => {
                 if count == 2 {
                     (0, State::Waiting, 0)

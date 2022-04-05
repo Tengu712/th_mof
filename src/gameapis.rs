@@ -22,3 +22,21 @@ fn indicator_bool(arg: bool) -> u32 {
         0
     }
 }
+
+/// A max function for f32.
+fn max<T: PartialOrd>(a: T, b: T) -> T {
+    if b > a {
+        b
+    } else {
+        a
+    }
+}
+
+/// A min function for f32.
+fn min<T: PartialOrd>(a: T, b: T) -> T {
+    if b < a {
+        b
+    } else {
+        a
+    }
+}
