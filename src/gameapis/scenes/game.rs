@@ -76,7 +76,7 @@ impl GameScene {
             .push_imgrq(chara_2p.get_imgrq())
             .push_request(Request::Reverse(false))
             .join(ui_reqs);
-        let next = self.get_next_scene(count, chara_1p, chara_2p);
+        let next = self.get_next_scene(count, chara_1p, chara_2p, dialogue);
         (next, reqs)
     }
     /// A method to update count each state.
@@ -115,12 +115,12 @@ impl GameScene {
     fn get_ui(&self, dialogue: &Dialogue) -> Requests {
         match self.state {
             State::Titling => {
-                if self.count >= 30 {
+                if self.count >= 20 {
                     Requests::new().push_imgrq(
                         ImageRequest::new(self.get_title_imgresid())
                             .lt(640.0, 300.0)
                             .cntr(true)
-                            .alph(1.0 - min(max((self.count as f32 - 80.0) / 60.0, 0.0), 1.0)),
+                            .alph(1.0 - min(max((self.count as f32 - 80.0) / 30.0, 0.0), 1.0)),
                     )
                 } else {
                     Requests::new()
@@ -131,15 +131,15 @@ impl GameScene {
                     .push_request(Request::Reverse(b))
                     .push_imgrq(
                         ImageRequest::new(ImgResID::SpeechBubble)
-                            .lt(640.0, 180.0)
+                            .lt(640.0, 200.0)
                             .cntr(true),
                     )
                     .push_request(Request::Reverse(false))
                     .push_txtrq(
-                        TextRequest::new(s.as_str())
-                            .ltrb(0.0, 160.0, 1280.0, 720.0)
+                        TextRequest::new(s)
+                            .ltrb(0.0, 170.0, 1280.0, 720.0)
                             .rgba(0.0, 0.0, 0.0, 1.0)
-                            .set_size(50.0)
+                            .set_size(40.0)
                             .set_align(1),
                     ),
                 None => Requests::new(),
@@ -160,7 +160,13 @@ impl GameScene {
         }
     }
     /// A method to get next scene.
-    fn get_next_scene(self, count: u32, chara_1p: Character, chara_2p: Character) -> Scene {
+    fn get_next_scene(
+        self,
+        count: u32,
+        chara_1p: Character,
+        chara_2p: Character,
+        dialogue: &Dialogue,
+    ) -> Scene {
         let (winner, state, count) = match self.state {
             State::Titling => {
                 if count >= 180 {
@@ -170,7 +176,7 @@ impl GameScene {
                 }
             }
             State::Talking => {
-                if count == 2 {
+                if count == dialogue.get_dialogue_len(&self.mode) as u32 {
                     (0, State::Waiting, 0)
                 } else {
                     (0, self.state, count)

@@ -1,6 +1,6 @@
 use super::*;
 
-const NUM_CHARACTERS: usize = 40;
+const NUM_CHARACTERS: usize = 80;
 
 /// A struct that's entity of drawing text request.
 #[derive(Clone, Copy)]
@@ -20,7 +20,7 @@ pub struct TextRequest {
 
 impl TextRequest {
     /// Constructor.
-    pub fn new(text_str: &str) -> Self {
+    pub fn new(text_str: String) -> Self {
         let txt_arr = text_str.as_bytes();
         let mut text = [0u8; NUM_CHARACTERS];
         for i in 0..NUM_CHARACTERS {

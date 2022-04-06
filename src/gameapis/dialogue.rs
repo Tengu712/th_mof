@@ -85,4 +85,13 @@ impl Dialogue {
         }
         None
     }
+    /// A method to get dialogue len based on mode.
+    pub fn get_dialogue_len(&self, mode: &Mode) -> usize {
+        for i in self.logs.iter() {
+            if mode == &i.mode {
+                return i.strs.len();
+            }
+        }
+        0
+    }
 }
